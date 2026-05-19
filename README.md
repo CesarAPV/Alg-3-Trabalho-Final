@@ -3,4 +3,5 @@ Repositório dedicado ao desenvolvimento do trabalho final da disciplina de Algo
 
 # Autores
 * **Cesar Augusto P. V.** - [CesarAPV](https://github.com/CesarAPV)
+* **Gustavo Henrique Oliveira Silva** - [GustaOliverRO](https://github.com/GustaoliverRO)
 * **Seus Nomes** - [Usuário do GitHub](https://github.com)
