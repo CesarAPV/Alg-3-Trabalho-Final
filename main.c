@@ -105,22 +105,66 @@ int heap_remove(Heap *h, No *no) {
     go_down(h, 0);
     return 0;
 }
+
 void print_no(No no) {
     printf("ID: %d \tKey: %f\n", no.id, no.key);
 }
 
+// Retorna o id do min para verificar possível fim do programa;
+int id_Heap_min(Heap *h){
+    No *aux;
+    *aux = h->array[0];
+    return aux->id;
+}
+
+// Função principal do programa
+// Pede o erro_base a ser retirado;
+// Retira o no min_heap se for menor que o erro;
+// Pede para recalcular a área...
+//...->tanto a direita quanto a esquerda do no a ser substituído;
+void process_execute(Heap *h, No *vet){
+    
+    float Erro;
+    int controle_id;
+    int flag_erro = 0;
+
+    scanf("%f\n", &Erro);
+
+    controle_id = id_Heap_min(h);
+    // Laço de execução da modificação;
+    while(controle_id != 1 && controle_id != h->capacity && !flag_erro){
+    }
+    
+
+}
 int main() {
-    Heap *h = create_heap(10);
+    
+    int tam_entrada;
+    scanf("%d\n", &tam_entrada);
+
+    No *vet = malloc(sizeof(No) * tam_entrada);
+    Heap *h = create_heap(tam_entrada);
+
     No d1  = {1,  15.5 };
+    vet[d1.id--] = d1;
     No d2  = {2,  10.3 };
+    vet[d2.id--] = d2;
     No d3  = {3,  40.3 };
+    vet[d3.id--] = d3;
     No d4  = {4,  5.6  };
+    vet[d4.id--] = d4;
     No d5  = {5,  231.2};
+    vet[d5.id--] = d5;
     No d6  = {6,  1.2  };
+    vet[d6.id--] = d6;
     No d7  = {7,  23.1 };
+    vet[d7.id--] = d7;
     No d8  = {8,  0.2  };
+    vet[d8.id--] = d8;
     No d9  = {9,  4.3  };
+    vet[d9.id--] = d9;
     No d10 = {10, 2.1  };
+    vet[d10.id--] = d10;
 
     insert(h, &d1);
     insert(h, &d2);
@@ -133,6 +177,7 @@ int main() {
     insert(h, &d9);
     insert(h, &d4);
 
+    process_execute(h,vet);
 
     No aux = {0};
     while(h->size > 0) {
