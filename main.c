@@ -13,6 +13,7 @@ typedef struct _heap {
     int      capacity;
 } Heap;
 
+// Suspeito que todos os x são int;
 float area_triangulo(float x1, float y1,
                      float x2, float y2,
                      float x3, float y3){
@@ -21,7 +22,7 @@ float area_triangulo(float x1, float y1,
     
     return(area < 0.0) ? - area : area;
 }
-
+// Suspeito que todos os x são int;
 float altura_triangulo(float x1, float y1,
                      float x2, float y2,
                      float x3, float y3){
@@ -122,49 +123,68 @@ int id_Heap_min(Heap *h){
 // Retira o no min_heap se for menor que o erro;
 // Pede para recalcular a área...
 //...->tanto a direita quanto a esquerda do no a ser substituído;
-void process_execute(Heap *h, No *vet){
+void process_execute(Heap *h, float Erro){
     
-    float Erro;
     int controle_id;
     int flag_erro = 0;
-
-    scanf("%f\n", &Erro);
 
     controle_id = id_Heap_min(h);
     // Laço de execução da modificação;
     while(controle_id != 1 && controle_id != h->capacity && !flag_erro){
+        
+
     }
     
-
 }
-int main() {
+
+int main(int argc, char *argv[]) {
+
+    if (argc < 3){
+        printf("Uso correto da entrada: './programa' 'tipo' 'Erro'\n");
+        return 1;
+    }
     
+    // Acho que será necessário fazer casting com função que converte
+    // string em inteiro/float;
+    int tipo = atoi(argv[1]);
+    float Erro = atof(argv[2]);
     int tam_entrada;
+
     scanf("%d\n", &tam_entrada);
 
-    No *vet = malloc(sizeof(No) * tam_entrada);
+    //No *vet = malloc(sizeof(No) * tam_entrada);
     Heap *h = create_heap(tam_entrada);
 
     No d1  = {1,  15.5 };
-    vet[d1.id--] = d1;
+    //[d1.id--] = d1;
+    h->array[0] = d1;
     No d2  = {2,  10.3 };
-    vet[d2.id--] = d2;
+    //vet[d2.id--] = d2;
+    h->array[1] = d2;
     No d3  = {3,  40.3 };
-    vet[d3.id--] = d3;
+    //vet[d3.id--] = d3;
+    h->array[2] = d3;
     No d4  = {4,  5.6  };
-    vet[d4.id--] = d4;
+    //vet[d4.id--] = d4;
+    h->array[3] = d4;
     No d5  = {5,  231.2};
-    vet[d5.id--] = d5;
+    //vet[d5.id--] = d5;
+    h->array[4] = d5;
     No d6  = {6,  1.2  };
-    vet[d6.id--] = d6;
+    //vet[d6.id--] = d6;
+    h->array[5] = d6;
     No d7  = {7,  23.1 };
-    vet[d7.id--] = d7;
+    //vet[d7.id--] = d7;
+    h->array[6] = d7;
     No d8  = {8,  0.2  };
-    vet[d8.id--] = d8;
+    //vet[d8.id--] = d8;
+    h->array[7] = d8;
     No d9  = {9,  4.3  };
-    vet[d9.id--] = d9;
+    //vet[d9.id--] = d9;
+    h->array[8] = d9;
     No d10 = {10, 2.1  };
-    vet[d10.id--] = d10;
+    //vet[d10.id--] = d10;
+    h->array[9] = d10;
 
     insert(h, &d1);
     insert(h, &d2);
@@ -175,9 +195,9 @@ int main() {
     insert(h, &d7);
     insert(h, &d8);
     insert(h, &d9);
-    insert(h, &d4);
+    insert(h, &d10);
 
-    process_execute(h,vet);
+    process_execute(h,Erro);
 
     No aux = {0};
     while(h->size > 0) {
