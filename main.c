@@ -3,8 +3,8 @@
 #include <string.h>
 
 typedef struct no {
-    int id;
-    float key;
+    int id; // "x"
+    float key; // "y"
 } No;
 
 typedef struct _heap {
@@ -13,7 +13,6 @@ typedef struct _heap {
     int      capacity;
 } Heap;
 
-// Suspeito que todos os x são int;
 float area_triangulo(float x1, float y1,
                      float x2, float y2,
                      float x3, float y3){
@@ -22,7 +21,7 @@ float area_triangulo(float x1, float y1,
     
     return(area < 0.0) ? - area : area;
 }
-// Suspeito que todos os x são int;
+
 float altura_triangulo(float x1, float y1,
                      float x2, float y2,
                      float x3, float y3){
@@ -123,17 +122,9 @@ int id_Heap_min(Heap *h){
 // Retira o no min_heap se for menor que o erro;
 // Pede para recalcular a área...
 //...->tanto a direita quanto a esquerda do no a ser substituído;
-void process_execute(Heap *h, float Erro){
+void process_execute(Heap *h, float erro, int tipo){
     
     int controle_id;
-    int flag_erro = 0;
-
-    controle_id = id_Heap_min(h);
-    // Laço de execução da modificação;
-    while(controle_id != 1 && controle_id != h->capacity && !flag_erro){
-        
-
-    }
     
 }
 
@@ -147,13 +138,17 @@ int main(int argc, char *argv[]) {
     // Acho que será necessário fazer casting com função que converte
     // string em inteiro/float;
     int tipo = atoi(argv[1]);
-    float Erro = atof(argv[2]);
+    float erro = atof(argv[2]);
     int tam_entrada;
 
     scanf("%d\n", &tam_entrada);
 
     //No *vet = malloc(sizeof(No) * tam_entrada);
     Heap *h = create_heap(tam_entrada);
+
+    /* Os nós estão sendo inseridos no array auxiliar da estrura heap
+       depois da leitura, na função de execução, cria o heap com as áreas
+    */
 
     No d1  = {1,  15.5 };
     //[d1.id--] = d1;
@@ -185,6 +180,8 @@ int main(int argc, char *argv[]) {
     No d10 = {10, 2.1  };
     //vet[d10.id--] = d10;
     h->array[9] = d10;
+
+    process_execute(h,erro, tipo);
 
     insert(h, &d1);
     insert(h, &d2);
