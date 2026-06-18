@@ -1,213 +1,147 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "Heap.h"
+#include "Utility.h"
 
-typedef struct no {
-    int     x;
-    float   y;
-    float   key;
-} No;
 
-typedef struct _heap {
-    No      *array;
-    int      size;
-    int      capacity;
-} Heap;
+#define FLAG_HEIGHT 1
+#define FLAG_AREA 2
 
-float area_triangulo(float x1, float y1, float x2, float y2, float x3, float y3 ){
-    float area;
-    area = (x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2)) / 2;
+#define REMOVED -1
 
-    return(area < 0.0) ? - area : area;
-}
+/**
+ * Funcao que insere todos os pontos do vetor values no heap, exceto os pontos de borda,
+ * usando a flag para determinar qual valor sera usado como chave
+ */
+void entries_to_heap(Heap *heap, int *indexer, float *values, int n_points, int flag) {
+    No node;
+    for(int i = 1; i < n_points - 1; i++) {
+        float key;
 
-float altura_triangulo(float x1, float y1,float x2, float y2, float x3, float y3){
-    float area, dx, dy;
+        if(flag == FLAG_HEIGHT)
+            key = altura_triangulo(i-1, values[i-1], i, values[i], i+1, values[i+1]);
+        else
+            key = area_triangulo(i-1, values[i-1], i, values[i], i+1, values[i+1]);
+        node = (No){i, values[i], key};
 
-    area = area_triangulo(x1, y1, x2, y2, x3, y3);
-    dx = x3 - x1;
-    dy = y3 -y1;
-    return 4 * (area * area) / (dx * dy + dy * dy);
-}
-
-void swap(No *a, No *b) {
-    No temp = *a;
-    *a = *b;
-    *b = temp;
-}
-
-int parent(int i) {
-    return (i-1)/2;
-}
-
-/* funcao que insere um no no heap, e atualiza o
- * indexer dos nos que foram modificados no processo */
-int insert(Heap *h, int *indexer, No no) {
-    if(h->size == h->capacity) {
-        printf("Error: heap full!\n");
-        return -1;
+        indexer[i] = insert(heap, indexer, node);
     }
+}
 
-    int i = h->size;
-    h->size++;
-
-    h->array[i] = no;
-
-    indexer[no.x] = i;
-    while(i != 0 && h->array[i].key < h->array[parent(i)].key) {
-        swap(&h->array[i], &h->array[parent(i)]);
-        indexer[h->array[i].x] = i;
-        indexer[h->array[parent(i)].x] = parent(i);
-        i = parent(i);
-    }
-
+/**
+ * Funcao que busca o vizinho a esquerda de um ponto, ou seja, o proximo ponto a esquerda que nao foi 'removido' do heap
+ */
+int search_left_neighbor(int *indexer, int i) {
+    while(i > 0 && indexer[i] == REMOVED) i--;
     return i;
 }
 
-/* funcao que cria um heap vazio com capacidade maxima definida */
-Heap *create_heap(int capacity) {
-    Heap *h = (Heap*) malloc(sizeof(Heap));
-    h->capacity = capacity;
-    h->size = 0;
-    h->array = malloc(sizeof(No) * capacity);
-
-    memset(h->array, 0, sizeof(No) * capacity);
-
-    return h;
+/**
+ * Funcao que busca o vizinho a direita de um ponto, ou seja, o proximo ponto a direita que nao foi 'removido' do heap
+ */
+int search_neighbor_right(int *indexer, int i, int n_points) {
+    while(i < (n_points-1) && indexer[i] == REMOVED) i++;
+    return i;
 }
 
-/* Funcao que atualiza a posicao de um no 'descendo'
- * ele pelo heap, ate encontrar a posicao correta */
-void go_down(Heap *h, int *indexer, int i) {
-    int small = i;
-    int left  = 2*i + 1;
-    int right = 2*i + 2;
+void update_neighbors(Heap *heap, No *no, int *indexer, float *values, int i, int n_points)
+{
+    // i é o indice do ponto removido
+    int i = no->x;
 
-    if(left < h->size && h->array[left].key < h->array[small].key)
-        small = left;
-    if(right < h->size && h->array[right].key < h->array[small].key)
-        small = right;
+    /* l e r point sao os vizinhos desse ponto.
+     * a principio sao i-1 e i+1, mas podem estar
+     * 'removidos' da lista, defini como removidos
+     * aqueles que sao indexados para -1 */
+    int l_point = i - 1;
+    int r_point = i + 1;
+    // ll e rr point sao os vizinhos dos vizinhos
 
-    if(small != i) {
-        swap(&h->array[i], &h->array[small]);
-        indexer[h->array[i].x] = i;
-        indexer[h->array[small].x] = small;
-        go_down(h, indexer, small);
-    }
-}
+    // Marca o ponto como removido
+    indexer[i] = REMOVED;
 
-/* funcao simetrica a anterior */
-void go_up(Heap *h, int *indexer, int i) {
-    while(i != 0 && h->array[i].key < h->array[parent(i)].key) {
-        swap(&h->array[i], &h->array[parent(i)]);
-        indexer[h->array[i].x] = i;
-        indexer[h->array[parent(i)].x] = parent(i);
-        i = parent(i);
-    }
-}
+    // Busca os vizinhos a esquerda e a direita do ponto removido, achando um que não esteja removido
+    l_point = search_left_neighbor(indexer, l_point);
+    r_point = search_neighbor_right(indexer, r_point, n_points);
 
-/* funcao que remove o primeiro no do heap, e atualiza
- * os indexers do nos modificados no processo */
-int heap_remove(Heap *h, No *no, int *indexer) {
-    if(h->size <= 0) {
-        printf("Erro: heap empty\n");
-        no->x = -1;
-        return -1;
-    }
-    if(h->size == 1) {
-        h->size--;
-        *no = h->array[0];
-        return -1;
+    if (l_point > 0) {
+        // Busca o vizinho a esquerda do vizinho a esquerda do ponto removido
+        int ll_point = l_point - 1;
+        ll_point = search_left_neighbor(indexer, ll_point);
+
+        // atualiza o ponto indexado por l_point com nova chave l_key
+        float l_key = area_triangulo(ll_point, values[ll_point], l_point, values[l_point], r_point, values[r_point]);
+        update_heap(heap, indexer, l_point, l_key);
     }
 
-    *no = h->array[0];
-    h->array[0] = h->array[h->size-1];
-    indexer[h->array[0].x] = 0;
-    h->size--;
+    if (r_point < n_points - 1) {
+        // Busca o vizinho a direita do vizinho a direita do ponto removido
+        int rr_point = r_point + 1;
+        rr_point = search_neighbor_right(indexer, rr_point, n_points);
 
-    go_down(h, indexer, 0);
-    return 0;
-}
-
-/* funcao que atualiza a posicao de um no que teve sua chave alterada */
-void update_heap(Heap *h, int *indexer, int x, float new_key) {
-    int pos = indexer[x];
-    float old_key = h->array[pos].key;
-    h->array[pos].key = new_key;
-
-    if(new_key > old_key)
-        go_down(h, indexer, pos);
-    else if(new_key < old_key)
-        go_up(h, indexer, pos);
+        // atualiza o ponto indexaod por r_point com nova chave r_key
+        float r_key = area_triangulo(l_point, values[l_point], r_point, values[r_point], rr_point, values[rr_point]);
+        update_heap(heap, indexer, r_point, r_key);
+    }
 }
 
 int main(int argc, char *argv[]) {
-    int n_points;       // numero de pontos que serao lidos
+    // Verifica se o numero de argumentos esta correto
+    if(argc < 3){
+        printf("Uso correto: %s -{flag} {valor_de_ponto_flutuante}\n", argv[0]);
+        return 0;
+    }
 
+    // Inteiro que define se o programa vai usar a area ou a altura do triangulo como chave do heap
+    int flag;
+    if (!strcmp(argv[1], "-h")) {
+        flag = FLAG_HEIGHT;
+    } else if (!strcmp(argv[1], "-a")) {
+        flag = FLAG_AREA;
+    } else {
+        printf("Flag desconhecida: %s\n", argv[1]);
+        return 0;
+    }
+
+    // Valor maximo para remover um ponto do heap, ou seja, o erro maximo permitido
+    float max_error = atof(argv[2]);
+
+    // numero de pontos que serao lidos
+    int n_points;       
     scanf("%d", &n_points);
+
     /* Vetor que indexa cada posicao do heap
      * por exemplo se i[1] -> 4, significa que
      * o ponto com abscissa x = 1 esta na posicao 4
      * do heap */
     int *indexer = malloc(sizeof(int) * n_points);
+    memset(indexer, 0, sizeof(int) * n_points);
+
     // Vetor auxiliar que possui todas as coordenadas
     float *values = malloc(sizeof(float) * n_points);
-    Heap *heap = create_heap(n_points);
-    memset(indexer, 0, sizeof(int) * n_points);
     memset(values, 0, sizeof(float) * n_points);
-
-    // le todos os valores: O(n)
+    
+    Heap *heap = create_heap(n_points);
+    
+    // Le todos os valores: O(n)
     for(int i = 0; i < n_points; i++) {
         scanf("%f", &values[i]);
     }
 
+    // Insere os pontos de [1..n-2] no heap, usando o calculo de chave definido pela flag
+    entries_to_heap(heap, indexer, values, n_points, flag);
+
     No no;
-    // insere os pontos de [1..n-2] no heap
-    // baseando-se em seus erros
-    for(int i = 1; i < n_points - 1; i++) {
-        float key = area_triangulo(i-1, values[i-1], i, values[i], i+1, values[i+1]);
-        no = (No){i, values[i], key};
-        indexer[i] = insert(heap, indexer, no);
-    }
-
-
-    // para testes: modifique o numero que esta na condicao do while
-    while(heap->size > 0 && heap->array[0].key < 1.5){
+    while(heap->size > 0 && heap->array[0].key < max_error){
+        // Remove o ponto com menor chave do heap, ou seja, o ponto com menor erro
         heap_remove(heap, &no, indexer);
 
-        // i eh o indice do ponto removido
-        int i = no.x;
-        /* l e r point sao os vizinhos desse ponto.
-         * a principio sao i-1 e i+1, mas podem estar
-         * 'removidos' da lista, defini como removidos
-         * aqueles que sao indexados para -1 */
-        int l_point = i - 1, ll_point;
-        int r_point = i + 1, rr_point;
-        // ll e rr point sao os vizinhos dos vizinhos
-
-        indexer[i] = -1;
-        while(l_point > 0 && indexer[l_point] == -1 ) l_point--;
-        while(r_point < (n_points-1) && indexer[r_point] == -1) r_point++;
-
-        if(l_point > 0) {
-            ll_point = l_point - 1;
-            while(ll_point > 0 && indexer[ll_point] == -1) ll_point--;
-            float l_key = area_triangulo(ll_point, values[ll_point], l_point, values[l_point], r_point, values[r_point]);
-            // atualiza o ponto indexado por l_point com nova chave l_key
-            update_heap(heap, indexer, l_point, l_key);
-        }
-
-        if(r_point < n_points - 1) {
-            rr_point = r_point + 1;
-            while(rr_point < n_points -1 && indexer[rr_point] == -1) rr_point++;
-            float r_key = area_triangulo(l_point, values[l_point], r_point, values[r_point], rr_point, values[rr_point]);
-            // atualiza o ponto indexaod por r_point com nova chave r_key
-            update_heap(heap, indexer, r_point, r_key);
-        }
+        update_neighbors(heap, &no, indexer, values, no.x, n_points);
     }
 
 
-    // imprime os pontos restantes, incluindo sempre as bordas pelo menos
+    // Imprime os pontos restantes, incluindo sempre as bordas pelo menos
     printf("%d %f\n", 0, values[0]);
     while(heap->size != 0) {
         heap_remove(heap, &no, indexer);
