@@ -45,8 +45,7 @@ int search_neighbor_right(int *indexer, int i, int n_points) {
     return i;
 }
 
-void update_neighbors(Heap *heap, No *no, int *indexer, float *values, int i, int n_points)
-{
+void update_neighbors(Heap *heap, No *no, int *indexer, float *values, int n_points, int flag) {
     // i é o indice do ponto removido
     int i = no->x;
 
@@ -71,7 +70,12 @@ void update_neighbors(Heap *heap, No *no, int *indexer, float *values, int i, in
         ll_point = search_left_neighbor(indexer, ll_point);
 
         // atualiza o ponto indexado por l_point com nova chave l_key
-        float l_key = area_triangulo(ll_point, values[ll_point], l_point, values[l_point], r_point, values[r_point]);
+        float l_key;
+        if( flag == FLAG_HEIGHT)
+            l_key = altura_triangulo(ll_point, values[ll_point], l_point, values[l_point], r_point, values[r_point]);
+        else
+            l_key = area_triangulo(ll_point, values[ll_point], l_point, values[l_point], r_point, values[r_point]);
+
         update_heap(heap, indexer, l_point, l_key);
     }
 
@@ -81,8 +85,25 @@ void update_neighbors(Heap *heap, No *no, int *indexer, float *values, int i, in
         rr_point = search_neighbor_right(indexer, rr_point, n_points);
 
         // atualiza o ponto indexaod por r_point com nova chave r_key
-        float r_key = area_triangulo(l_point, values[l_point], r_point, values[r_point], rr_point, values[rr_point]);
+        float r_key;
+        if( flag == FLAG_HEIGHT)
+            r_key = altura_triangulo(l_point, values[l_point], r_point, values[r_point], rr_point, values[rr_point]);
+        else
+            r_key = area_triangulo(l_point, values[l_point], r_point, values[r_point], rr_point, values[rr_point]);
+
         update_heap(heap, indexer, r_point, r_key);
+    }
+}
+
+void print_result(int n_points, int n_points_end, int *indexer, float *values) {
+    // Imprime a quantidade total de pares
+    printf("%d\n", (n_points_end+2));
+
+    // Imprime cada par ordenado (X, Y) na ordem correta do eixo X
+    for (int i = 0; i < n_points; i++) {
+        if (indexer[i] != -1) {
+            printf("%.1f %g\n", (float)(i + 1), values[i]);
+        }
     }
 }
 
@@ -137,17 +158,12 @@ int main(int argc, char *argv[]) {
         // Remove o ponto com menor chave do heap, ou seja, o ponto com menor erro
         heap_remove(heap, &no, indexer);
 
-        update_neighbors(heap, &no, indexer, values, no.x, n_points);
+        update_neighbors(heap, &no, indexer, values, n_points, flag);
     }
 
 
     // Imprime os pontos restantes, incluindo sempre as bordas pelo menos
-    printf("%d %f\n", 0, values[0]);
-    while(heap->size != 0) {
-        heap_remove(heap, &no, indexer);
-        printf("%d %f \t %f\n", no.x, no.y, no.key);
-    }
-    printf("%d %f\n", n_points-1, values[n_points-1]);
+    print_result(n_points, heap->size, indexer, values);
 
     free(heap->array);
     free(heap);
