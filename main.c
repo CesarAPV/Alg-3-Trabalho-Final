@@ -153,7 +153,7 @@ int main(int argc, char *argv[]) {
     // Insere os pontos de [1..n-2] no heap, usando o calculo de chave definido pela flag
     entries_to_heap(heap, indexer, values, n_points, flag);
 
-    No no;
+    No no;  
     while(heap->size > 0 && heap->array[0].key < max_error){
         // Remove o ponto com menor chave do heap, ou seja, o ponto com menor erro
         heap_remove(heap, &no, indexer);
@@ -165,8 +165,7 @@ int main(int argc, char *argv[]) {
     // Imprime os pontos restantes, incluindo sempre as bordas pelo menos
     print_result(n_points, heap->size, indexer, values);
 
-    free(heap->array);
-    free(heap);
+    destroy_heap(heap);
     free(indexer);
     free(values);
     return 0;
