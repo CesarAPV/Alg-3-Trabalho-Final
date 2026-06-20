@@ -23,7 +23,7 @@ typedef struct _heap {
     No      *array;
     int      size;
     int      capacity;
-    Index     *indexer
+    Index    *indexer;
 } Heap;
 
 
