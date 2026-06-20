@@ -42,8 +42,10 @@ Heap *create_heap(int capacity) {
     h->capacity = capacity;
     h->size = 0;
     h->array = malloc(sizeof(No) * capacity);
+    h->indexer = malloc(sizeof(Index) * capacity);
 
     memset(h->array, 0, sizeof(No) * capacity);
+    memset(h->indexer, 0, sizeof(Index) * capacity);
 
     return h;
 }
