@@ -1,5 +1,5 @@
-#include "Heap.h"
 #include <string.h>
+#include "../inc/Heap.h"
 
 void swap(No *a, No *b) {
     No temp = *a;
@@ -24,7 +24,7 @@ int insert(Heap *h, No no) {
     h->size++;
 
     h->array[i] = no;
-    
+
     // Inicia com -1 nas bordas
     h->indexer[no.x].current = i;
     h->indexer[no.x].left = -1;
@@ -35,7 +35,7 @@ int insert(Heap *h, No no) {
       h->indexer[no.x].left = i - 1;
       h->indexer[no.x - 1].right = i;
     }
-    
+
     while(i != 0 && h->array[i].key < h->array[parent(i)].key) {
         swap(&h->array[i], &h->array[parent(i)]);
         h->indexer[h->array[i].x].current = i;
