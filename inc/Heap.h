@@ -11,7 +11,7 @@ typedef struct no {
     float   key;
 } No;
 
-typedef struct index {
+typedef struct _index {
     int     left;
     int     current;
     int     right;
@@ -20,10 +20,10 @@ typedef struct index {
 
 /* Estrutura do min-heap que armazena os nos em um vetor dinâmico e controla o tamanho */
 typedef struct _heap {
-    No      *array;
+    No       *array;
+    Index    *indexer;
     int      size;
     int      capacity;
-    Index    *indexer;
 } Heap;
 
 

@@ -3,7 +3,7 @@ CFLAGS = -Wall -Wextra -Iinc
 
 SOURCE = $(wildcard src/*.c)
 
-all: $(SOURCE)
+all:
 	$(CC) $(CFLAGS) $(SOURCE) -o main
 
 clean:

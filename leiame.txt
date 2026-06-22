@@ -1,0 +1,17 @@
+Membros do grupo:
+*   Kauê Nonemacher Felau - GRR20252007
+...
+
+Resumo:
+    O código-fonte está organizado em 3 módulos principais: Heap.c, main.c e Utility.c, este último apenas contém as funções de cálculo de área e altura. O arquivo Heap.c é responsável por lidar somente com funções relacionadas a organização e atualização da estrutura de dados Heap, com funções para criar e destruir um heap, inserir e remover um elemento, respeitando as regras da estrutura. Já o arquivo main.c é responsável por utilizar o min-heap do outro módulo, para abstrair a complexidade e desenvolver o algoritmo visto no artigo.
+
+Estruturas de dados:
+    O No, que representa um elemento da fila de prioridades, possui dois campos (x,y) que indicam um ponto no plano cartesiano, juntamente com uma "key" que é semelhante ao erro visto no arquivo. Contudo, somente o ponto (x,y) do nó é insuficiente para calcular sua chave correspondente, é necessário conhecer também os pontos vizinhos do ponto (x,y).
+
+    O Index, é a estrutura que nos permite encontrar qualquer ponto dentro do heap em O(1), ela possui um campo 'current' que indica qual é a posição de um ponto na fila de prioridades. Também possui campos left e right que representam as abscissas dos pontos vizinhos ao ponto 'current', e de forma recursiva podemos verificar o 'current' destes campos. A principal necessidade desta estrutura possuir estes 2 ultimos campos é que sem eles precisariamos procurar indice a indice qual é o vizinho atual do ponto 'current', isso seria custoso demais, especificamente O(n), portanto utilizamos esses 2 campos para implementarmos uma Lista Duplamente Encadeada que nos ajuda a encontrar pontos rapidamente no heap.
+
+    O Heap, que é a estrutura de dados principal do programa, possui 4 campos essenciais, sendo eles:
+        * array: é um array de Nos onde "reside" o heap propriamente, as operações principais da estrutura são realizadas neste campo, como a busca, inserção e remoção. Esse array tem seu número de elementos alterados de forma dinâmica, atráves dos próximos 2 campos.
+        * capacity: representa o tamanho máximo de nós que podem residir no heap.
+        * size: representa a quantidade atual de nós no heap, a cada inserção aumenta em 1 e a cada remoção diminui em 1.
+        * indexer: é um array de Index's que funciona como um dicionário onde a chave é a abscissa do ponto (x,y) e o valor é a posição dele no heap, juntamente com as abscissas dos seus vizinhos atuais.

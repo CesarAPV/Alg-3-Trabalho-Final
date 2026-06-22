@@ -25,16 +25,7 @@ int insert(Heap *h, No no) {
 
     h->array[i] = no;
 
-    // Inicia com -1 nas bordas
     h->indexer[no.x].current = i;
-    h->indexer[no.x].left = -1;
-    h->indexer[no.x].right = -1;
-
-    // Corrige os indexes da 'tabela'
-    if(no.x > 1){
-      h->indexer[no.x].left = i - 1;
-      h->indexer[no.x - 1].right = i;
-    }
 
     while(i != 0 && h->array[i].key < h->array[parent(i)].key) {
         swap(&h->array[i], &h->array[parent(i)]);
@@ -58,6 +49,20 @@ Heap *create_heap(int capacity) {
     memset(h->indexer, 0, sizeof(Index) * capacity);
 
     return h;
+}
+
+void destroy_heap(Heap *h) {
+    if(!h) return;
+    if(h->array) {
+        free(h->array);
+        h->array = NULL;
+    }
+    if(h->indexer) {
+        free(h->indexer);
+        h->indexer = NULL;
+    }
+    free(h);
+    h = NULL;
 }
 
 /* Funcao que atualiza a posicao de um no 'descendo'
@@ -99,12 +104,6 @@ int heap_remove(Heap *h, No *no) {
         no->x = -1;
         return -1;
     }
-    if(h->size == 1) {
-        h->size--;
-        *no = h->array[0];
-        return -1;
-    }
-
     *no = h->array[0];
     h->array[0] = h->array[h->size-1];
     h->indexer[h->array[0].x].current = 0;
