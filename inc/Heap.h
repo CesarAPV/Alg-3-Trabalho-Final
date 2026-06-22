@@ -4,10 +4,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-/* Estrutura que representa um ponto, guardando seu x original, valor y e a chave (erro) */
+/* Estrutura que representa um ponto no heap, guardando seu x original e a chave (erro) */
 typedef struct no {
     int     x;
-    float   y;
     float   key;
 } No;
 
@@ -15,6 +14,7 @@ typedef struct _index {
     int     left;
     int     current;
     int     right;
+    float   y;
 } Index;
 
 
