@@ -154,8 +154,7 @@ int main(int argc, char *argv[]) {
     // Imprime os pontos restantes, incluindo sempre as bordas pelo menos
     print_result(n_points, heap->size, heap->indexer, values);
 
-    //destroy_heap(heap);
-    //free(indexer);
+    destroy_heap(heap);
     free(values);
     return 0;
 }

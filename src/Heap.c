@@ -60,6 +60,14 @@ Heap *create_heap(int capacity) {
     return h;
 }
 
+/* funcao que destroi um heap */
+void destroy_heap(Heap *h){
+    free(h->array);
+    free(h->indexer);
+    free(h);
+}
+
+
 /* Funcao que atualiza a posicao de um no 'descendo'
  * ele pelo heap, ate encontrar a posicao correta */
 void go_down(Heap *h, int i) {
