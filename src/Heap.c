@@ -12,30 +12,6 @@ int parent(int i) {
 }
 
 
-/* funcao que insere um no no heap, e atualiza o
- * indexer dos nos que foram modificados no processo */
-int insert(Heap *h, No no) {
-    if(h->size == h->capacity) {
-        printf("Error: heap full!\n");
-        return -1;
-    }
-
-    int i = h->size;
-    h->size++;
-
-    h->array[i] = no;
-
-    h->indexer[no.x].current = i;
-
-    while(i != 0 && h->array[i].key < h->array[parent(i)].key) {
-        swap(&h->array[i], &h->array[parent(i)]);
-        h->indexer[h->array[i].x].current = i;
-        h->indexer[h->array[parent(i)].x].current = parent(i);
-        i = parent(i);
-    }
-
-    return i;
-}
 
 /* funcao que cria um heap vazio com capacidade maxima definida */
 Heap *create_heap(int capacity) {
@@ -94,6 +70,28 @@ void go_up(Heap *h, int i) {
         h->indexer[h->array[parent(i)].x].current = parent(i);
         i = parent(i);
     }
+}
+
+/* funcao que insere um no no heap, e atualiza o
+ * indexer dos nos que foram modificados no processo */
+int heap_insert(Heap *h, No no) {
+    if(h->size == h->capacity) {
+        printf("Error: heap full!\n");
+        return -1;
+    }
+
+    int i = h->size;
+    h->size++;
+    h->array[i] = no;
+    h->indexer[no.x].current = i;
+
+    while(i != 0 && h->array[i].key < h->array[parent(i)].key) {
+        swap(&h->array[i], &h->array[parent(i)]);
+        h->indexer[h->array[i].x].current = i;
+        h->indexer[h->array[parent(i)].x].current = parent(i);
+        i = parent(i);
+    }
+    return i;
 }
 
 /* funcao que remove o primeiro no do heap, e atualiza

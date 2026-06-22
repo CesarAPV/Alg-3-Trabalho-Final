@@ -9,6 +9,7 @@
 
 #define REMOVED -1
 
+// funcao que calcula o erro do triangulo formado por tres pontos p1,p2,p3
 float calc_key(float *values, int l, int m, int r, int flag) {
     if(flag == FLAG_HEIGHT)
         return altura_triangulo(l, values[l], m, values[m], r, values[r]);
@@ -24,15 +25,10 @@ void fill_heap(Heap *heap,  float *values, int n_points, int flag) {
     No node;
     for(int i = 1; i < n_points - 1; i++) {
         float key;
-
-        if(flag == FLAG_HEIGHT)
-            key = altura_triangulo(i-1, values[i-1], i, values[i], i+1, values[i+1]);
-        else
-            key = area_triangulo(i-1, values[i-1], i, values[i], i+1, values[i+1]);
+        key = calc_key(values, i-1, i, i+1, flag);
         node = (No){i, values[i], key};
-
         /* Indexa o nó com x = i na fila de prioridade */
-        heap->indexer[i].current = insert(heap, node);
+        heap->indexer[i].current = heap_insert(heap, node);
     }
 }
 
@@ -75,7 +71,7 @@ void update_neighbors(Heap *heap, No *no, float *values, int n_points, int flag)
 
 void print_result(int n_points, int n_points_end, Index *indexer, float *values) {
     // Imprime a quantidade total de pares
-    printf("%d\n", (n_points_end+2));
+    printf("%d\n", (n_points > 1) ? (n_points_end+2) : n_points);
 
     /* Imprime cada par ordenado (X, Y) na ordem correta do eixo X *
      * Só imprime se o ponto não foi REMOVIDO */
@@ -92,7 +88,6 @@ int main(int argc, char *argv[]) {
         printf("Uso correto: %s -{flag} {valor_de_ponto_flutuante}\n", argv[0]);
         return 0;
     }
-
     // Inteiro que define se o programa vai usar a area ou a altura do triangulo como chave do heap
     int flag;
     if (!strcmp(argv[1], "-h"))
@@ -136,14 +131,12 @@ int main(int argc, char *argv[]) {
     No no;
     while(heap->size > 0 && heap->array[0].key < max_error){
         // Remove o ponto com menor chave do heap, ou seja, o ponto com menor erro
-        printf("key: %f\n", heap->array[0].key);
         heap_remove(heap, &no);
         update_neighbors(heap, &no, values, n_points, flag);
     }
 
     // Imprime os pontos restantes, incluindo sempre as bordas pelo menos
     print_result(n_points, heap->size, heap->indexer, values);
-
     destroy_heap(heap);
     free(values);
     return 0;
